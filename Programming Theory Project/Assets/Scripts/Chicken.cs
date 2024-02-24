@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class Chicken : Animal
+public class Chicken : Animal //INHERITANCE
 {
     // Override Run function for chickens
-    public override void Run()
+    public override void Run() //POLYMORPHISM
     {
         // Get the direction from the player to the chicken
         Vector3 playerDirection = transform.position - Player.instance.transform.position;

@@ -8,7 +8,7 @@ public abstract class Animal : MonoBehaviour
     private float _wanderSpeed = 2f;
     private float _changeDirectionInterval = 3f;
 
-    // Public properties with getter and setter methods
+    // Public properties with getter and setter methods // ENCAPSULATION
     public string AnimalName
     {
         get { return GetAnimalName(); }
@@ -93,6 +93,6 @@ public abstract class Animal : MonoBehaviour
         _changeDirectionInterval = value;
     }
 
-    // Abstract method representing the running behavior
+    // Abstract method representing the running behavior //ABSTRACTION
     public abstract void Run();
 }
