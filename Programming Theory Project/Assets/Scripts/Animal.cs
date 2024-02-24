@@ -1,101 +1,98 @@
 using System.Collections;
 using UnityEngine;
 
-public class Animal : MonoBehaviour
+public abstract class Animal : MonoBehaviour
 {
-    // Attributes
-    private bool isSelected = false;
-    private bool isEating = false;
+    // Encapsulated attributes
+    private string _animalName;
+    private float _wanderSpeed = 2f;
+    private float _changeDirectionInterval = 3f;
+
+    // Public properties with getter and setter methods
+    public string AnimalName
+    {
+        get { return GetAnimalName(); }
+        set { SetAnimalName(value); }
+    }
+
+    public float WanderSpeed
+    {
+        get { return GetWanderSpeed(); }
+        set { SetWanderSpeed(value); }
+    }
+
+    public float ChangeDirectionInterval
+    {
+        get { return GetChangeDirectionInterval(); }
+        set { SetChangeDirectionInterval(value); }
+    }
+
+    // Components
+    protected Rigidbody rb;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
-        // Initialize any necessary values
+        rb = GetComponent<Rigidbody>();
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+        // Start wandering coroutine
+        StartCoroutine(Wander());
     }
 
-    // Update is called once per frame
-    void Update()
+    // Coroutine for wandering
+    private IEnumerator Wander()
     {
-        Move();
-
-        // Check for user input to select or eat
-        CheckInput();
-    }
-
-    void Move()
-    {
-        // Implement movement logic
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        // Adjust position based on input
-        transform.Translate(new Vector3(horizontal, 0f, vertical) * Time.deltaTime * 5f);
-
-        // Jump with space
-        if (Input.GetKeyDown(KeyCode.Space))
+        while (true)
         {
-            Jump();
+            // Generate a random direction
+            Vector3 randomDirection = Random.insideUnitSphere * 10f;
+
+            // Flatten the direction to stay on the same plane as the ground
+            randomDirection.y = 0f;
+
+            // Normalize the direction to ensure consistent speed
+            randomDirection.Normalize();
+
+            // Move the animal in the random direction
+            rb.velocity = randomDirection * WanderSpeed;
+
+            // Wait for a random interval before changing direction again
+            yield return new WaitForSeconds(Random.Range(ChangeDirectionInterval * 0.5f, ChangeDirectionInterval * 1.5f));
         }
     }
 
-    void Jump()
+    // Getters and setters using methods
+    private string GetAnimalName()
     {
-        // Implement jump logic
-        // For example, apply force to Rigidbody for realistic jumping
-        Rigidbody rb = GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.AddForce(Vector3.up * 500f);
-        }
+        return _animalName;
     }
 
-    void CheckInput()
+    private void SetAnimalName(string value)
     {
-        // Check for left mouse button click to select
-        if (Input.GetMouseButtonDown(0))
-        {
-            Select();
-        }
-
-        // Check for 'E' key to initiate eating
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Eat();
-        }
+        _animalName = value;
     }
 
-    void Select()
+    private float GetWanderSpeed()
     {
-        // Toggle the selected state
-        isSelected = !isSelected;
-
-        // Perform actions based on selection state
-        if (isSelected)
-        {
-            Debug.Log("Animal selected!");
-        }
-        else
-        {
-            Debug.Log("Animal deselected.");
-        }
+        return _wanderSpeed;
     }
 
-    void Eat()
+    private void SetWanderSpeed(float value)
     {
-        // Check if the animal is in a cage
-        // Implement logic to initiate eating when in a cage
-        if (isInCage())
-        {
-            isEating = true;
-            Debug.Log("Animal is eating.");
-        }
+        _wanderSpeed = value;
     }
 
-    bool isInCage()
+    private float GetChangeDirectionInterval()
     {
-        // Implement logic to check if the animal is in a cage
-        // For example, check if the animal's position is within a specific range or collider
-        // Return true if the animal is in a cage, otherwise return false
-        return false;
+        return _changeDirectionInterval;
     }
+
+    private void SetChangeDirectionInterval(float value)
+    {
+        _changeDirectionInterval = value;
+    }
+
+    // Abstract method representing the running behavior
+    public abstract void Run();
 }
